@@ -113,6 +113,8 @@ export async function register(payload: {
   email: string;
   password: string;
   password_confirmation: string;
+  country?: string;
+  profile_pic?: string;
 }) {
   try {
     await csrf();

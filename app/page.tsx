@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import { FormEvent, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/Button";
+import { ModalRegistrarse } from "@/components/ModalRegistrarse";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,25 +15,22 @@ export default function LoginPage() {
   const [password, setPassword] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [showRegister, setShowRegister] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setLocalError(null);
     setSubmitting(true);
 
-    const ok = await login(email.trim().toLowerCase(), password); // AuthController espera email
+    const ok = await login(email.trim().toLowerCase(), password);
 
     setSubmitting(false);
 
     if (ok) {
       router.push("/campeonatos");
     } else {
-      setLocalError("Email o contraseña incorrectos.");
+      setLocalError("Email o contrasena incorrectos.");
     }
-  }
-
-  function handleGoRegister() {
-    router.push("/register");
   }
 
   const errorMessage = localError || authError;
@@ -63,20 +61,20 @@ export default function LoginPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-9 rounded-none border border-gray-400 bg-white px-2 text-sm font-roboto text-black shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
+            className="h-9 rounded border border-gray-400 bg-white px-2 text-sm font-roboto text-black shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
             required
           />
         </div>
 
         <div className="flex flex-col gap-1">
           <label className="font-league text-base text-primary">
-            Contraseña:
+            Contrasena:
           </label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-9 rounded-none border border-gray-400 bg-white px-2 text-sm font-roboto text-black shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
+            className="h-9 rounded border border-gray-400 bg-white px-2 text-sm font-roboto text-black shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
             required
           />
         </div>
@@ -92,7 +90,7 @@ export default function LoginPage() {
             disabled={submitting}
             className="min-w-[220px]"
           >
-            {submitting ? "Iniciando sesión..." : "Iniciar sesión"}
+            {submitting ? "Iniciando sesion..." : "Iniciar sesion"}
           </Button>
         </div>
       </form>
@@ -104,11 +102,16 @@ export default function LoginPage() {
           variant="secondary"
           size="lg"
           className="min-w-[220px]"
-          onClick={handleGoRegister}
+          onClick={() => setShowRegister(true)}
         >
           Registrarse
         </Button>
       </div>
+
+      <ModalRegistrarse
+        open={showRegister}
+        onClose={() => setShowRegister(false)}
+      />
     </div>
   );
 }

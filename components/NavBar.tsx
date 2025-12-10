@@ -48,10 +48,11 @@ export function NavBar() {
         </div>
 
         {!loading && (
-          <div className="flex justify-end items-center gap-3 rounded-full bg-primary pl-15 pr-3 py-2">
-            <div className="hidden sm:flex flex-col leading-tight text-right">
-              <span className="font-league flex items-center justify-end gap-1">
-                {user?.name ?? "Invitado"} {user?.country && <span>{user.country}</span>}
+          <div className="flex shrink-0 items-center gap-3 rounded-full bg-primary pl-6 pr-3 py-2">
+            <div className="hidden sm:flex flex-col leading-tight text-right max-w-[150px]">
+              <span className="font-league flex items-center justify-end gap-2 truncate">
+                <span className="truncate">{user?.name ?? "Invitado"}</span>
+                {user?.country && <span className="flex-shrink-0">{user.country}</span>}
               </span>
             </div>
             <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-white text-primary font-league">
