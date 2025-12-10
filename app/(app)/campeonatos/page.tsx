@@ -103,9 +103,7 @@ export default function CampeonatosPage() {
       if (!selectedId) return;
       try {
         const members =
-          (await getChampionshipMembers(
-            selectedId
-          )) as ChampionshipMember[];
+          (await getChampionshipMembers(selectedId)) as ChampionshipMember[];
         setChampionships((prev) =>
           prev.map((c) => (c.id === selectedId ? { ...c, members } : c))
         );
@@ -123,6 +121,7 @@ export default function CampeonatosPage() {
           relative z-10 grid w-full
           grid-cols-1 gap-8 md:gap-10
           lg:grid-cols-12
+          mt-8
         "
       >
         {/* Columna 1: Mis campeonatos */}
@@ -149,7 +148,7 @@ export default function CampeonatosPage() {
                     }`}
                   >
                     {c.name}
-                    {c.isAdmin ? " 👑" : ""}
+                    {c.isAdmin ? " (Admin)" : ""}
                   </button>
                 );
               })}
@@ -157,14 +156,21 @@ export default function CampeonatosPage() {
                 variant="secondary"
                 className="w-full rounded-3xl py-3 font-league"
               >
-                + Añadir nuevo torneo
+                + Añadir nuevo campeonato
               </Button>
             </div>
           )}
         </section>
 
         {/* Columnas 2 y 3: panel del campeonato */}
-        {selected && <ChampionshipPanel championship={selected} />}
+        {selected && (
+          <ChampionshipPanel
+            key={`${selected.id}-${selected.members
+              .map((m) => m.id)
+              .join("-")}`}
+            championship={selected}
+          />
+        )}
       </div>
     </div>
   );
@@ -210,40 +216,51 @@ function ChampionshipPanel({ championship }: { championship: Championship }) {
             <h4 className="text-base font-league uppercase tracking-wide text-primary">
               Miembros:
             </h4>
-            <Button
-              variant="secondary"
-              className="rounded-xl px-4 py-2 text-xs sm:text-sm"
-            >
-              Usuarios baneados
-            </Button>
+            
           </div>
 
-          <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+          <div className="space-y-2 max-h-64 overflow-y-auto pr-7">
             {members.map((m, idx) => (
               <div key={m.id ?? idx} className="flex items-center gap-2">
                 <span className="w-5 text-right text-sm">{idx + 1}.</span>
-                <input
-                  value={m.name}
-                  onChange={(e) => {
-                    const next = [...members];
-                    next[idx] = { ...m, name: e.target.value };
-                    setMembers(next);
-                  }}
-                  className="flex-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <button
-                  type="button"
-                  className="text-lg font-semibold text-red-600 hover:scale-110"
-                  aria-label="Eliminar miembro"
-                  onClick={() =>
-                    setMembers(members.filter((_, i) => i !== idx))
-                  }
-                >
-                  ✕
-                </button>
+                <span className="w-12 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs shadow-inner text-primary text-center">
+                  {m.country || "N/A"}
+                </span>
+                {m.profile_pic ? (
+                  <img
+                    src={m.profile_pic}
+                    alt={m.name ?? "Avatar"}
+                    className="h-8 w-8 rounded-full border border-gray-200 object-cover"
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-full border border-gray-200 bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
+                    {(m.name ?? "?").charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="flex-1 rounded-md border border-gray-200 px-2 py-2 text-sm shadow-inner text-primary">
+                  {m.name}
+                </span>
+                {championship.isAdmin && (
+                  <button
+                    type="button"
+                    className="text-lg font-semibold text-red-600 hover:scale-110"
+                    aria-label="Eliminar miembro"
+                    onClick={() =>
+                      setMembers(members.filter((_, i) => i !== idx))
+                    }
+                  >
+                    X
+                  </button>
+                )}
               </div>
             ))}
           </div>
+          <Button
+            variant="secondary"
+            className="rounded-xl mt-5 px-4 py-2 text-xs sm:text-sm"
+          >
+            Usuarios baneados
+          </Button>
         </div>
       </section>
 
@@ -264,12 +281,12 @@ function ChampionshipPanel({ championship }: { championship: Championship }) {
             <p className="text-xs sm:text-sm font-roboto text-primary">
               Código:{" "}
               <span className="font-league text-base sm:text-lg">
-                {championship.code || "—"}
+                {championship.code || "¿?"}
               </span>
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm font-roboto text-primary">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm font-roboto text-primary lg:mt-12">
             {[
               ["1º puesto", "p1"],
               ["2º puesto", "p2"],
