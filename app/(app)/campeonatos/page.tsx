@@ -221,7 +221,7 @@ export default function CampeonatosPage() {
               {championships.length < 5 && (
                 <Button
                   variant="secondary"
-                  className="w-full rounded-3xl py-3 font-league"
+                  className="w-full rounded-3xl py-3 font-league transition hover:bg-primary hover:text-white"
                   onClick={() => {
                     setJoinCode("");
                     setJoinError(null);
