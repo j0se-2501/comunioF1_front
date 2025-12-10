@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 const tabs = [
   { name: "Campeonatos", href: "/campeonatos" },
@@ -14,7 +15,12 @@ const tabs = [
 
 export function NavBar() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, loading, reloadUser } = useAuth();
+
+  useEffect(() => {
+    reloadUser().catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
     <header className="mb-8">
@@ -41,26 +47,27 @@ export function NavBar() {
           })}
         </div>
 
-        <div className="flex justify-end items-center gap-3 rounded-full bg-primary pl-15 pr-5 py-2">
-          <div className="hidden sm:flex flex-col leading-tight text-right">
-            
-            <span className="font-league">
-              {user?.name ?? "Invitado"}
-            </span>
+        {!loading && (
+          <div className="flex justify-end items-center gap-3 rounded-full bg-primary pl-15 pr-3 py-2">
+            <div className="hidden sm:flex flex-col leading-tight text-right">
+              <span className="font-league flex items-center justify-end gap-1">
+                {user?.name ?? "Invitado"} {user?.country && <span>{user.country}</span>}
+              </span>
+            </div>
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-white text-primary font-league">
+              {user?.profile_pic ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={user.profile_pic}
+                  alt={user.name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                (user?.name ?? "U").slice(0, 2).toUpperCase()
+              )}
+            </div>
           </div>
-          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-white text-primary font-league text-sm">
-            {user?.profile_pic ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={user.profile_pic}
-                alt={user.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              (user?.name ?? "U").slice(0, 2).toUpperCase()
-            )}
-          </div>
-        </div>
+        )}
       </nav>
 
       {/* Tabs móviles */}
