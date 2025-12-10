@@ -38,8 +38,8 @@ export default function LoginPage() {
   return (
     <div className="flex w-full max-w-4xl flex-col items-center gap-6 sm:gap-0 text-primary">
       {/* Logo */}
-      <div className="flex flex-col items-center mb-4 sm:mb-0">
-        <div className="relative h-60 w-[460px] sm:h-72 sm:w-[600px] lg:h-120 lg:w-[700px]">
+      <div className="flex flex-col items-center mb-4 sm:mb-6">
+        <div className="relative h-60 w-[460px] sm:h-72 sm:w-[600px] lg:h-84 lg:w-[700px]">
           <Image
             src="/icons/logo.png"
             alt="Formula Comunio"

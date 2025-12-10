@@ -4,11 +4,11 @@ import { ReactNode } from "react";
 import { NavBar } from "@/components/NavBar";
 import { ProtectedBoundary } from "@/components/ProtectedBoundary";
 
+// layout.tsx
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-aqua">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/icons/logo.png"
           alt="Formula Comunio"
@@ -16,7 +16,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         />
       </div>
       <ProtectedBoundary>
-        <div className="mx-auto flex min-h-screen max-w-8xl flex-col px-6 py-4 relative z-10">
+        <div className="relative z-10 mx-auto flex min-h-screen max-w-8xl flex-col px-4 py-3 sm:px-6 sm:py-4">
           <NavBar />
           <main className="flex-1">{children}</main>
         </div>
@@ -24,3 +24,4 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
