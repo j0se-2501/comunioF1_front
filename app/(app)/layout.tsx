@@ -16,7 +16,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         />
       </div>
       <ProtectedBoundary>
-        <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-8 relative z-10">
+        <div className="mx-auto flex min-h-screen max-w-8xl flex-col px-6 py-4 relative z-10">
           <NavBar />
           <main className="flex-1">{children}</main>
         </div>

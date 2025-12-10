@@ -90,7 +90,7 @@ export default function AjustesPage() {
         Ajustes de usuario
       </h1>
 
-      <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 sm:gap-8 xl:gap-80 2xl:gap-120 lg:grid-cols-2">
         <form
           onSubmit={handleSaveProfile}
           className="rounded-2xl bg-white/70 p-4 sm:p-6 shadow-sm backdrop-blur"
@@ -101,7 +101,7 @@ export default function AjustesPage() {
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 w-full border border-gray-300 px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
+              className="mt-1 w-full border border-gray-300 bg-white px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </label>
@@ -173,7 +173,7 @@ export default function AjustesPage() {
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="mt-1 w-full border border-gray-300 px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
+              className="mt-1 w-full border border-gray-300 bg-white px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </label>
@@ -183,7 +183,7 @@ export default function AjustesPage() {
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="mt-1 w-full border border-gray-300 px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
+              className="mt-1 w-full border border-gray-300 bg-white px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
               required
               minLength={6}
             />
@@ -194,7 +194,7 @@ export default function AjustesPage() {
               type="password"
               value={newPassword2}
               onChange={(e) => setNewPassword2(e.target.value)}
-              className="mt-1 w-full border border-gray-300 px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
+              className="mt-1 w-full border border-gray-300 bg-white px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
               required
               minLength={6}
             />
@@ -230,4 +230,3 @@ export default function AjustesPage() {
     </div>
   );
 }
-

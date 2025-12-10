@@ -35,7 +35,7 @@ export function NavBar() {
                 key={tab.href}
                 href={tab.href}
                 className={clsx(
-                  "rounded-full px-15 py-4 font-league transition-colors",
+                  "rounded-full px-4 md:px-6 lg:px-14 xl:px-20 2xl:px-30 py-4 font-league transition-colors",
                   active
                     ? "bg-primary-hover text-white shadow-sm"
                     : "text-white hover:bg-primary/60"
