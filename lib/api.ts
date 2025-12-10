@@ -192,8 +192,8 @@ export async function updateUserSettings(
 
 export async function changePassword(payload: {
   current_password: string;
-  password: string;
-  password_confirmation: string;
+  new_password: string;
+  new_password_confirmation: string;
 }) {
   try {
     await csrf();

@@ -35,7 +35,7 @@ export function NavBar() {
                 key={tab.href}
                 href={tab.href}
                 className={clsx(
-                  "rounded-full px-20 py-4 font-league transition-colors",
+                  "rounded-full px-15 py-4 font-league transition-colors",
                   active
                     ? "bg-primary-hover text-white shadow-sm"
                     : "text-white hover:bg-primary/60"
@@ -49,7 +49,7 @@ export function NavBar() {
 
         {!loading && (
           <div className="flex shrink-0 items-center gap-3 rounded-full bg-primary pl-6 pr-3 py-2">
-            <div className="hidden sm:flex flex-col leading-tight text-right max-w-[150px]">
+            <div className="hidden sm:flex flex-col leading-tight text-right w-[150px]">
               <span className="font-league flex items-center justify-end gap-2 truncate">
                 <span className="truncate">{user?.name ?? "Invitado"}</span>
                 {user?.country && <span className="flex-shrink-0">{user.country}</span>}
