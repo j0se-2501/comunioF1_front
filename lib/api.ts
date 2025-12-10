@@ -264,11 +264,78 @@ export async function leaveChampionship(id: number) {
   }
 }
 
+export async function banChampionshipUser(id: number, userId: number) {
+  try {
+    await csrf();
+    const { data } = await api.post(`/api/championships/${id}/ban/${userId}`);
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function unbanChampionshipUser(id: number, userId: number) {
+  try {
+    await csrf();
+    const { data } = await api.post(`/api/championships/${id}/unban/${userId}`);
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function joinChampionship(invitation_code: string) {
+  try {
+    await csrf();
+    const { data } = await api.post(`/api/championships/join`, {
+      invitation_code,
+    });
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
 export async function getChampionshipMembers(
   id: number
 ): Promise<ChampionshipMember[]> {
   try {
     const { data } = await api.get(`/api/championships/${id}/members`);
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function getChampionshipActiveMembers(
+  id: number
+): Promise<ChampionshipMember[]> {
+  try {
+    const { data } = await api.get(`/api/championships/${id}/members/active`);
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function getChampionshipBannedMembers(
+  id: number
+): Promise<ChampionshipMember[]> {
+  try {
+    const { data } = await api.get(`/api/championships/${id}/members/banned`);
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function updateChampionshipName(
+  id: number,
+  name: string
+) {
+  try {
+    await csrf();
+    const { data } = await api.put(`/api/championships/${id}`, { name });
     return data;
   } catch (error) {
     throw new Error(getErrorMessage(error));
@@ -282,6 +349,15 @@ export async function updateChampionshipScoring(
   try {
     await csrf();
     const { data } = await api.put(`/api/championships/${id}/scoring`, payload);
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function getChampionshipScoring(id: number) {
+  try {
+    const { data } = await api.get(`/api/championships/${id}/scoring`);
     return data;
   } catch (error) {
     throw new Error(getErrorMessage(error));
