@@ -1,7 +1,8 @@
 import "./globals.css";
 import { ReactNode } from "react";
 import { League_Spartan, Roboto } from "next/font/google";
-import { NavBar } from "@/components/NavBar";
+import { AuthProvider } from "@/context/AuthContext";
+import { Footer } from "@/components/Footer";
 
 const leagueSpartan = League_Spartan({
   subsets: ["latin"],
@@ -14,21 +15,20 @@ const roboto = Roboto({
   variable: "--font-roboto",
 });
 
-export const metadata = {
-  title: "Formula Comunio",
-  description: "Gestión de campeonatos, predicciones y resultados",
-};
-
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
       <body
         className={`${leagueSpartan.variable} ${roboto.variable} bg-aqua min-h-screen`}
       >
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <NavBar />
-          {children}
-        </div>
+        <AuthProvider>
+          <div className="min-h-screen flex flex-col">
+            <main className="flex-1 flex items-center justify-center px-4 py-10">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

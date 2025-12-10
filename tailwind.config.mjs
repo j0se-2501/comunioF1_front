@@ -1,20 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 const config = {
   content: [
-    "./src/**/*.{js,jsx,ts,tsx,mdx}",
-    "./app/**/*.{js,jsx,ts,tsx,mdx}",
-    "./components/**/*.{js,jsx,ts,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./context/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
         primary: "#444c67",       // azul oscuro
-        primaryHover: "#262a39",  // azul oscuro hover
-        aqua: "#c1dbda",          // turquesa
+        "primary-hover": "#262a39",  // azul oscuro hover
+        aqua: "#c1dbda",          // fondo verde-azulado
       },
       fontFamily: {
-      league: "var(--font-league)",
-      roboto: "var(--font-roboto)",
+        league: "var(--font-league)",
+        roboto: "var(--font-roboto)",
       },
     },
   },

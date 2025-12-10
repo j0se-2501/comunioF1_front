@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import { useAuth } from "@/context/AuthContext";
 
 const tabs = [
   { name: "Campeonatos", href: "/campeonatos" },
@@ -13,20 +14,14 @@ const tabs = [
 
 export function NavBar() {
   const pathname = usePathname();
+  const { user } = useAuth();
 
   return (
-    <header className="mb-6">
-      <nav className="flex items-center justify-between gap-4 rounded-2xl bg-primary text-white px-4 py-3 shadow-md">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-primary font-league text-lg">
-            F
-          </span>
-          <span className="font-league text-lg tracking-wide hidden sm:inline">
-            Formula Comunio
-          </span>
-        </div>
+    <header className="mb-8">
+      <nav className="flex items-center justify-between gap-4 rounded-3xl bg-primary text-white px-0 py-0 shadow-md">
+        
 
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden md:flex flex-1 items-center gap-2 justify-between rounded-full bg-primary px-0 py-0">
           {tabs.map((tab) => {
             const active = pathname.startsWith(tab.href);
             return (
@@ -34,10 +29,10 @@ export function NavBar() {
                 key={tab.href}
                 href={tab.href}
                 className={clsx(
-                  "rounded-full px-3 py-1 text-sm font-league transition-colors",
+                  "rounded-full px-20 py-4 font-league transition-colors",
                   active
-                    ? "bg-white text-primary"
-                    : "text-white/80 hover:bg-primaryHover"
+                    ? "bg-primary-hover text-white shadow-sm"
+                    : "text-white hover:bg-primary/60"
                 )}
               >
                 {tab.name}
@@ -46,19 +41,30 @@ export function NavBar() {
           })}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex justify-end items-center gap-3 rounded-full bg-primary pl-15 pr-5 py-2">
           <div className="hidden sm:flex flex-col leading-tight text-right">
-            <span className="text-xs text-white/70">Conectado como</span>
-            <span className="text-sm font-league">Usuario Demo</span>
+            
+            <span className="font-league">
+              {user?.name ?? "Invitado"}
+            </span>
           </div>
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-primary font-league text-sm">
-            U
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-white text-primary font-league text-sm">
+            {user?.profile_pic ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user.profile_pic}
+                alt={user.name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              (user?.name ?? "U").slice(0, 2).toUpperCase()
+            )}
           </div>
         </div>
       </nav>
 
       {/* Tabs móviles */}
-      <div className="mt-3 flex md:hidden gap-2 overflow-x-auto pb-1">
+      <div className="mt-3 flex gap-2 overflow-x-auto pb-1 md:hidden">
         {tabs.map((tab) => {
           const active = pathname.startsWith(tab.href);
           return (
@@ -66,10 +72,10 @@ export function NavBar() {
               key={tab.href}
               href={tab.href}
               className={clsx(
-                "whitespace-nowrap rounded-full px-3 py-1 text-xs font-league",
+                "whitespace-nowrap rounded-full px-3 py-2 text-xs font-league",
                 active
                   ? "bg-primary text-white"
-                  : "bg-white text-primary border border-primary"
+                  : "border border-primary bg-white text-primary"
               )}
             >
               {tab.name}

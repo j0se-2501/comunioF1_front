@@ -14,7 +14,7 @@ const baseClasses =
   "inline-flex items-center justify-center rounded-full font-league tracking-wide transition-colors disabled:opacity-60 disabled:cursor-not-allowed";
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-primary hover:bg-primaryHover text-white",
+  primary: "bg-primary hover:bg-primary-hover text-white",
   secondary: "bg-white text-primary border border-primary hover:bg-aqua",
   ghost: "bg-transparent text-primary hover:bg-aqua",
 };

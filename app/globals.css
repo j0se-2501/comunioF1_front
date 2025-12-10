@@ -1,19 +1,17 @@
+@config "../tailwind.config.mjs";
 @import "tailwindcss";
 
 :root {
-  --font-league: 'League Spartan', sans-serif;
-  --font-roboto: 'Roboto', sans-serif;
+  --font-league: "League Spartan", sans-serif;
+  --font-roboto: "Roboto", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  padding: 0;
+  margin: 0;
 }
 
 body {
   font-family: var(--font-roboto);
-  padding: 0;
-  margin: 0;
 }
