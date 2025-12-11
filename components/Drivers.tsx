@@ -51,11 +51,7 @@ export function Drivers({
         shadow-sm backdrop-blur
       "
     >
-      {nextRace?.race_date && (
-        <p className="text-xs font-roboto text-primary/70">
-          {nextRace.name} · {new Date(nextRace.race_date).toLocaleDateString("es-ES")}
-        </p>
-      )}
+    
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-0 pt-3 gap-y-3 text-sm font-roboto text-primary">
         {positionLabels.map(([key, label]) => (

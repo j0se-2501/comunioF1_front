@@ -7,9 +7,13 @@ import {
   getRaceResults,
   getChampionshipActiveMembers,
   getRacePoints,
+  getUserRacePrediction,
+  getDrivers,
+  type Driver,
   type Championship as ApiChampionship,
   type Race,
   type RacePoint,
+  type PredictionPayload,
 } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
@@ -37,6 +41,30 @@ type RaceResultEntry = {
     country?: string;
     profile_pic?: string;
   };
+};
+
+type Scoring = {
+  p1: number;
+  p2: number;
+  p3: number;
+  p4: number;
+  p5: number;
+  p6: number;
+  pole: number;
+  fastLap: number;
+  last: number;
+};
+
+const defaultScoring: Scoring = {
+  p1: 10,
+  p2: 6,
+  p3: 4,
+  p4: 3,
+  p5: 2,
+  p6: 1,
+  pole: 3,
+  fastLap: 1,
+  last: 3,
 };
 
 function getLastFinishedRace(races: Race[]): Race | null {
@@ -76,6 +104,18 @@ export default function ResultadosPage() {
   const [lastRace, setLastRace] = useState<Race | null>(null);
   const [raceResults, setRaceResults] = useState<RaceResultEntry[]>([]);
   const [racePoints, setRacePoints] = useState<RacePoint[]>([]);
+  const [selectedPoint, setSelectedPoint] = useState<RacePoint | null>(null);
+  const [predictionDetail, setPredictionDetail] = useState<{
+    prediction?: PredictionPayload;
+    race_point?: RacePoint;
+    user?: { id?: number; name?: string };
+  } | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
+  const [scoring] = useState<Scoring>(defaultScoring);
+  const [driversMap, setDriversMap] = useState<
+    Record<number, { name: string; country?: string; number?: number }>
+  >({});
 
   const [loading, setLoading] = useState(true);
   const [raceLoading, setRaceLoading] = useState(false);
@@ -90,6 +130,10 @@ export default function ResultadosPage() {
     loadChampionships();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
+
+  useEffect(() => {
+    loadDrivers();
+  }, []);
 
   useEffect(() => {
     if (!selectedChampionship) return;
@@ -122,6 +166,19 @@ export default function ResultadosPage() {
       setMembers(list);
     } catch (err) {
       console.error("No se pudieron cargar los miembros", err);
+    }
+  }
+
+  async function loadDrivers() {
+    try {
+      const list = await getDrivers();
+      const map: Record<number, { name: string; country?: string; number?: number }> = {};
+      list.forEach((d: Driver) => {
+        if (d.id) map[d.id] = { name: d.name, country: d.country, number: d.number };
+      });
+      setDriversMap(map);
+    } catch (err) {
+      console.error("No se pudieron cargar los pilotos", err);
     }
   }
 
@@ -167,6 +224,38 @@ export default function ResultadosPage() {
     } finally {
       setRaceLoading(false);
     }
+  }
+
+  async function handleOpenDetail(point: RacePoint) {
+    if (!selectedChampionship || !lastRace) return;
+    const userId = point.user_id ?? point.user?.id;
+    if (!userId) return;
+    setSelectedPoint(point);
+    setDetailLoading(true);
+    setDetailError(null);
+    try {
+      const data = await getUserRacePrediction(selectedChampionship.id, lastRace.id, userId);
+      setPredictionDetail({
+        prediction: data?.prediction ?? data,
+        race_point: data?.race_point ?? point,
+        user:
+          data?.user ??
+          members.find((m) => m.id === userId) ??
+          { id: userId, name: point.user?.name },
+      });
+    } catch (err) {
+      const msg =
+        err instanceof Error ? err.message : "No se pudo cargar la predicción del usuario";
+      setDetailError(msg);
+    } finally {
+      setDetailLoading(false);
+    }
+  }
+
+  function handleCloseDetail() {
+    setSelectedPoint(null);
+    setPredictionDetail(null);
+    setDetailError(null);
   }
 
   const orderedMembers = useMemo(() => {
@@ -336,6 +425,7 @@ export default function ResultadosPage() {
                       country={rp.user?.country}
                       profile_pic={rp.user?.profile_pic}
                       points={rp.points ?? 0}
+                      onClick={() => handleOpenDetail(rp)}
                     />
                   ))}
               </div>
@@ -368,6 +458,28 @@ export default function ResultadosPage() {
           </div>
         </section>
       </div>
+      {selectedPoint && (
+        <PredictionModal
+          point={predictionDetail?.race_point ?? selectedPoint}
+          prediction={predictionDetail?.prediction}
+          userName={
+            predictionDetail?.user?.name ??
+            predictionDetail?.prediction?.user_name ??
+            selectedPoint?.user?.name ??
+            "Usuario"
+          }
+          userPic={
+            predictionDetail?.user?.profile_pic ??
+            predictionDetail?.prediction?.user_profile_pic ??
+            selectedPoint?.user?.profile_pic
+          }
+          onClose={handleCloseDetail}
+          scoring={scoring}
+          loading={detailLoading}
+          error={detailError}
+          driversMap={driversMap}
+        />
+      )}
     </div>
   );
 }
@@ -400,15 +512,21 @@ function StandingRow({
   country,
   profile_pic,
   points,
+  onClick,
 }: {
   position: number;
   name: string;
   country?: string;
   profile_pic?: string;
   points: number;
+  onClick?: () => void;
 }) {
   return (
-    <div className="flex items-center gap-2 rounded-2xl bg-white px-3 py-2 shadow-sm border border-gray-200">
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center gap-2 rounded-2xl bg-white px-3 py-2 shadow-sm border border-gray-200 w-full text-left"
+    >
       <span className="w-6 text-right font-league text-primary">{position}.</span>
       {country && (
         <span className="w-12 text-center rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-semibold text-primary">
@@ -431,6 +549,124 @@ function StandingRow({
         {name}
       </span>
       <span className="min-w-[48px] text-right font-semibold text-primary">{points}</span>
+    </button>
+  );
+}
+
+function PredictionModal({
+  point,
+  prediction,
+  scoring,
+  loading,
+  error,
+  userName,
+  userPic,
+  driversMap,
+  onClose,
+}: {
+  point: RacePoint;
+  prediction?: PredictionPayload;
+  scoring: Scoring;
+  loading: boolean;
+  error: string | null;
+  userName: string;
+  userPic?: string;
+  driversMap: Record<number, { name: string; country?: string; number?: number }>;
+  onClose: () => void;
+}) {
+  const rows: { label: string; val?: number | null; hit?: boolean; pts: number }[] = [
+    { label: "1º puesto", val: prediction?.position_1, hit: point.guessed_p1, pts: scoring.p1 },
+    { label: "2º puesto", val: prediction?.position_2, hit: point.guessed_p2, pts: scoring.p2 },
+    { label: "3º puesto", val: prediction?.position_3, hit: point.guessed_p3, pts: scoring.p3 },
+    { label: "4º puesto", val: prediction?.position_4, hit: point.guessed_p4, pts: scoring.p4 },
+    { label: "5º puesto", val: prediction?.position_5, hit: point.guessed_p5, pts: scoring.p5 },
+    { label: "6º puesto", val: prediction?.position_6, hit: point.guessed_p6, pts: scoring.p6 },
+    { label: "Pole", val: prediction?.pole, hit: point.guessed_pole, pts: scoring.pole },
+    { label: "V. rápida", val: prediction?.fastest_lap, hit: point.guessed_fastest_lap, pts: scoring.fastLap },
+    { label: "Último", val: prediction?.last_place, hit: point.guessed_last_place, pts: scoring.last },
+  ];
+
+  const driverLabel = (val?: number | null) => {
+    if (!val) return "-";
+    const info = driversMap[val];
+    if (!info) return `Piloto #${val}`;
+    return (
+      <span className="inline-flex items-center gap-2">
+        <span>#{info.number ?? "?"} {info.name}</span>
+        {info.country && (
+          <span className="rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-semibold text-primary">
+            {info.country}
+          </span>
+        )}
+      </span>
+    );
+  };
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 px-4">
+      <div className="w-full max-w-xl rounded-2xl bg-white p-5 shadow-2xl space-y-4">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            {userPic ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={userPic}
+                alt={userName}
+                className="h-12 w-12 rounded-full border border-gray-200 object-cover"
+              />
+            ) : (
+              <div className="h-12 w-12 rounded-full border border-gray-200 bg-primary/10 text-primary flex items-center justify-center text-lg font-semibold">
+                {userName.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div>
+            
+              <p className="text-lg font-league text-primary">{userName}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="text-sm font-semibold text-primary"
+            onClick={onClose}
+          >
+            Cerrar
+          </button>
+        </div>
+
+        {loading && <p className="text-sm text-primary/70">Cargando predicción...</p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
+
+        {!loading && (
+          <div className="space-y-2">
+            {rows.map((r, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 shadow-inner"
+              >
+                <span className="w-24 text-sm font-semibold text-primary">{r.label}</span>
+                <span className="flex-1 text-sm font-roboto text-primary">
+                  {driverLabel(r.val)}
+                </span>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    r.hit ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {r.hit ? "Acertó" : "Falló"}
+                </span>
+                <span className="min-w-[70px] text-right text-sm font-semibold text-primary">
+                  {r.hit ? `+${r.pts}` : "+0"} pts
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+          <span className="text-sm font-league text-primary">Total</span>
+          <span className="text-lg font-bold text-primary">{point.points ?? 0} pts</span>
+        </div>
+      </div>
     </div>
   );
 }

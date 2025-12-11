@@ -531,3 +531,18 @@ export async function getRacePoints(
     throw new Error(getErrorMessage(error));
   }
 }
+
+export async function getUserRacePrediction(
+  championshipId: number,
+  raceId: number,
+  userId: number
+) {
+  try {
+    const { data } = await api.get(
+      `/api/championships/${championshipId}/races/${raceId}/predictions/${userId}`
+    );
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
