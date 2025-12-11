@@ -72,7 +72,7 @@ export default function LoginPage() {
 
         <div className="flex flex-col gap-1">
           <label className="font-league text-base text-primary">
-            Contrasena:
+            Contraseña:
           </label>
           <input
             type="password"
@@ -94,7 +94,7 @@ export default function LoginPage() {
             disabled={submitting}
             className="min-w-[220px]"
           >
-            {submitting ? "Iniciando sesion..." : "Iniciar sesion"}
+            {submitting ? "Iniciando sesión..." : "Iniciar sesión"}
           </Button>
         </div>
       </form>
