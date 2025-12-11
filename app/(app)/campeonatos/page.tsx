@@ -207,10 +207,10 @@ export default function CampeonatosPage() {
                   <button
                     key={c.id}
                     onClick={() => setSelectedId(c.id)}
-                    className={`w-full rounded-3xl px-4 py-3 text-left font-league text-base shadow-sm transition ${
+                    className={`w-full cursor-pointer rounded-3xl px-4 py-3 text-left font-league text-base shadow-sm transition-transform ${
                       isActive
-                        ? "bg-primary text-white"
-                        : "bg-primary/80 text-white/90 hover:bg-primary"
+                        ? "bg-primary-hover text-white hover:scale-[1.02]"
+                        : "bg-primary text-white/90 hover:bg-primary hover:scale-[1.02]"
                     }`}
                   >
                     {c.name}
@@ -221,7 +221,7 @@ export default function CampeonatosPage() {
               {championships.length < 5 && (
                 <Button
                   variant="secondary"
-                  className="w-full rounded-3xl py-3 font-league transition hover:bg-primary hover:text-white"
+                  className="w-full cursor-pointer rounded-3xl py-3 font-league transition-transform hover:scale-[1.02] hover:bg-white hover:text-primary"
                   onClick={() => {
                     setJoinCode("");
                     setJoinError(null);
@@ -274,7 +274,7 @@ export default function CampeonatosPage() {
                 Añadir campeonato
               </h4>
               <button
-                className="text-sm font-semibold text-primary"
+                className="text-sm cursor-pointer font-semibold text-primary"
                 onClick={() => setShowAddModal(false)}
               >
                 Cerrar
@@ -282,7 +282,7 @@ export default function CampeonatosPage() {
             </div>
             <div className="space-y-3">
               <Button
-                className="w-full rounded-xl px-4 py-3 font-league"
+                className="cursor-pointer w-full rounded-xl px-4 py-3 font-league"
                 disabled={createLoading}
                 onClick={async () => {
                   setCreateLoading(true);
@@ -320,7 +320,7 @@ export default function CampeonatosPage() {
                 <p className="text-xs text-red-600">{createError}</p>
               )}
               <div className="rounded-xl border border-primary/20 p-3 space-y-2">
-                <p className="text-sm font-league text-primary uppercase">
+                <p className="text-sm cursor-pointer font-league text-primary uppercase">
                   Unirse a un campeonato
                 </p>
                 <input
@@ -536,7 +536,7 @@ function ChampionshipPanel({
           {championship.isAdmin && (
             <Button
               variant="secondary"
-              className="rounded-xl mt-5 px-4 py-2 text-xs sm:text-sm"
+              className="rounded-xl cursor-pointer mt-5 px-4 py-2 text-xs sm:text-sm"
               onClick={() => setShowBanned(true)}
             >
               Usuarios baneados
@@ -553,7 +553,7 @@ function ChampionshipPanel({
                 Usuarios baneados
               </h4>
               <button
-                className="text-sm font-semibold text-primary"
+                className="text-sm cursor-pointer font-semibold text-primary"
                 onClick={() => setShowBanned(false)}
               >
                 Cerrar
@@ -630,7 +630,7 @@ function ChampionshipPanel({
           {championship.isAdmin ? (
             <>
               <Button
-                className="w-full rounded-2xl px-5 py-3 font-league sm:w-auto"
+                className="w-full cursor-pointer rounded-2xl px-5 py-3 font-league sm:w-auto"
                 onClick={handleSave}
                 disabled={saving}
               >
@@ -638,7 +638,7 @@ function ChampionshipPanel({
               </Button>
               <Button
                 variant="secondary"
-                className="w-full rounded-2xl px-5 py-3 font-league sm:w-auto"
+                className="w-full rounded-2xl cursor-pointer px-5 py-3 font-league sm:w-auto"
                 onClick={handleLeave}
               >
                 Abandonar campeonato

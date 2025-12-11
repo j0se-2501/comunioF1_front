@@ -58,7 +58,7 @@ export function Drivers({
           <label key={key} className="flex items-center gap-2">
             <span className="w-18 sm:w-20 font-semibold">{label}.</span>
             <select
-              className="flex rounded-md border border-gray-300 bg-white px-3 py-2 shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
+              className="flex cursor-pointer rounded-md border border-gray-300 bg-white px-3 py-2 shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
               value={prediction[key] ?? ""}
               onChange={(e) => onSelect(key, e.target.value)}
               disabled={!drivers.length || raceLoading}
@@ -78,14 +78,14 @@ export function Drivers({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 sm:justify-end sm:self-end">
         <Button
           variant="secondary"
-          className="rounded-2xl px-6 py-3 font-league"
+          className="rounded-2xl px-6 py-3 font-league transition-transform hover:scale-[1.02] cursor-pointer"
           onClick={onClear}
           disabled={raceLoading}
         >
           Vaciar campos
         </Button>
         <Button
-          className="rounded-2xl px-6 py-3 font-league"
+          className="rounded-2xl px-6 py-3 font-league transition-transform hover:scale-[1.02] cursor-pointer"
           onClick={onSave}
           disabled={saving || !nextRace}
         >

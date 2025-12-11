@@ -303,11 +303,11 @@ export default function ResultadosPage() {
             )}
             {error && <p className="text-sm text-red-600">{error}</p>}
             {!loading && !error && championships.length > 0 && (
-              <div className="relative">
+              <div className="relative cursor-pointer">
                 <button
                   type="button"
                   onClick={() => setShowDropdown((v) => !v)}
-                  className="w-full rounded-3xl px-4 py-3 text-left font-league text-base shadow-sm transition bg-primary text-white flex items-center justify-between"
+                  className="w-full rounded-3xl px-4 py-3 text-left font-league text-base shadow-sm transition-transform bg-primary text-white flex items-center justify-between cursor-pointer hover:scale-[1.01]"
                 >
                   <span className="truncate">
                     {selectedChampionship?.name ?? "Selecciona campeonato"}
@@ -327,10 +327,10 @@ export default function ResultadosPage() {
                             setSelectedId(c.id);
                             setShowDropdown(false);
                           }}
-                          className={`w-full px-4 py-3 text-left font-league text-base transition ${
+                          className={`w-full px-4 py-3 text-left font-league text-base transition-transform ${
                             isActive
                               ? "bg-primary text-white"
-                              : "bg-white text-primary hover:bg-primary/10"
+                              : "bg-white text-primary hover:bg-primary/10 hover:scale-[1.02]"
                           }`}
                         >
                           {c.name}
@@ -525,7 +525,9 @@ function StandingRow({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center gap-2 rounded-2xl bg-white px-3 py-2 shadow-sm border border-gray-200 w-full text-left"
+      className={`flex items-center gap-2 rounded-2xl bg-white px-3 py-2 shadow-sm border border-gray-200 w-full text-left transition-transform ${
+        onClick ? "cursor-pointer hover:scale-[1.02]" : ""
+      }`}
     >
       <span className="w-6 text-right font-league text-primary">{position}.</span>
       {country && (
@@ -626,7 +628,7 @@ function PredictionModal({
           </div>
           <button
             type="button"
-            className="text-sm font-semibold text-primary"
+            className="text-sm font-semibold text-primary cursor-pointer"
             onClick={onClose}
           >
             Cerrar
