@@ -70,6 +70,7 @@ export default function ResultadosPage() {
 
   const [championships, setChampionships] = useState<ApiChampionship[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const [members, setMembers] = useState<MemberWithPivot[]>([]);
   const [lastRace, setLastRace] = useState<Race | null>(null);
@@ -212,24 +213,43 @@ export default function ResultadosPage() {
               <p className="text-sm text-primary/70">Cargando campeonatos...</p>
             )}
             {error && <p className="text-sm text-red-600">{error}</p>}
-            {!loading && !error && (
-              <div className="flex flex-col gap-3">
-                {championships.map((c) => {
-                  const isActive = c.id === selectedChampionship?.id;
-                  return (
-                    <button
-                      key={c.id}
-                      onClick={() => setSelectedId(c.id)}
-                      className={`w-full rounded-3xl px-4 py-3 text-left font-league text-base shadow-sm transition ${
-                        isActive
-                          ? "bg-primary text-white"
-                          : "bg-primary/80 text-white/90 hover:bg-primary"
-                      }`}
-                    >
-                      {c.name}
-                    </button>
-                  );
-                })}
+            {!loading && !error && championships.length > 0 && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowDropdown((v) => !v)}
+                  className="w-full rounded-3xl px-4 py-3 text-left font-league text-base shadow-sm transition bg-primary text-white flex items-center justify-between"
+                >
+                  <span className="truncate">
+                    {selectedChampionship?.name ?? "Selecciona campeonato"}
+                  </span>
+                  <span className="ml-3 text-lg leading-none">
+                    {showDropdown ? "▲" : "▼"}
+                  </span>
+                </button>
+                {showDropdown && (
+                  <div className="absolute z-20 mt-2 w-full rounded-2xl bg-white shadow-lg border border-primary/20 overflow-hidden">
+                    {championships.map((c) => {
+                      const isActive = c.id === selectedChampionship?.id;
+                      return (
+                        <button
+                          key={c.id}
+                          onClick={() => {
+                            setSelectedId(c.id);
+                            setShowDropdown(false);
+                          }}
+                          className={`w-full px-4 py-3 text-left font-league text-base transition ${
+                            isActive
+                              ? "bg-primary text-white"
+                              : "bg-white text-primary hover:bg-primary/10"
+                          }`}
+                        >
+                          {c.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -290,7 +310,7 @@ export default function ResultadosPage() {
           <h3 className="text-lg font-league uppercase tracking-wide">
             Resultados del último GP: {formatRaceName(lastRace)}
           </h3>
-          <div className="rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur space-y-3">
+          <div className="rounded-2xl bg-primary-hover p-5 shadow-sm backdrop-blur space-y-3">
             {raceLoading && (
               <p className="text-sm text-primary/70">
                 Cargando puntos del último GP...
@@ -328,7 +348,7 @@ export default function ResultadosPage() {
           <h3 className="text-lg font-league uppercase tracking-wide">
             Clasificación general:
           </h3>
-          <div className="rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur space-y-3">
+          <div className="rounded-2xl bg-primary p-5 shadow-sm backdrop-blur space-y-3">
             {orderedMembers.length ? (
               orderedMembers.map((member, idx) => (
                 <StandingRow
