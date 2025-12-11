@@ -80,19 +80,39 @@ export interface ChampionshipMember {
   email: string;
 }
 
+export interface Driver {
+  id: number;
+  name: string;
+  short_code: string;
+  number: number;
+  country?: string;
+  team?: {
+    id: number;
+    name: string;
+  };
+}
+
 export interface Race {
   id: number;
   name: string;
-  grand_prix?: string;
-  date: string;
-  deadline?: string;
+  round_number?: number;
+  race_date?: string;
+  qualy_date?: string;
+  grand_prix?: string; // compatibilidad
+  date?: string;       // compatibilidad
+  deadline?: string;   // compatibilidad
 }
 
 export interface PredictionPayload {
-  positions: number[];   
-  pole: number;
-  fastest_lap: number;
-  last_place: number;
+  position_1?: number | null;
+  position_2?: number | null;
+  position_3?: number | null;
+  position_4?: number | null;
+  position_5?: number | null;
+  position_6?: number | null;
+  pole?: number | null;
+  fastest_lap?: number | null;
+  last_place?: number | null;
 }
 
 export interface UserSettings {
@@ -366,9 +386,33 @@ export async function getChampionshipScoring(id: number) {
 
 //
 // ============================================================
+// DRIVERS
+// ============================================================
+//
+
+export async function getDrivers(): Promise<Driver[]> {
+  try {
+    const { data } = await api.get("/api/drivers");
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+//
+// ============================================================
 // PREDICTIONS
 // ============================================================
 //
+
+export async function getNextRacePublic(): Promise<Race> {
+  try {
+    const { data } = await api.get("/api/races/next");
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
 
 export async function getNextRace(championshipId: number) {
   try {
