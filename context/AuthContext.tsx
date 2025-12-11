@@ -8,7 +8,7 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<User | null>;
   logout: () => Promise<void>;
   reloadUser: () => Promise<void>;
   isAuthenticated: boolean;
@@ -44,21 +44,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ============================================================
   // LOGIN
   // ============================================================
-  async function login(email: string, password: string): Promise<boolean> {
-  try {
-    setError(null);
-    await apiLogin(email, password); // POST /api/login + cookies
-    await reloadUser();
-    return true;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      setError(error.message);
-    } else {
-      setError("Error desconocido al iniciar sesión");
+  async function login(email: string, password: string): Promise<User | null> {
+    try {
+      setError(null);
+      await apiLogin(email, password); // POST /api/login + cookies
+      const me = await getMe();
+      setUser(me);
+      return me;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Error desconocido al iniciar sesion");
+      }
+      setUser(null);
+      return null;
     }
-    return false;
   }
-}
 
 
   // ============================================================

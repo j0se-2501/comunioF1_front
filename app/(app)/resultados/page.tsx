@@ -55,6 +55,17 @@ type Scoring = {
   last: number;
 };
 
+type PredictionWithUserMeta = PredictionPayload & {
+  user_name?: string;
+  user_profile_pic?: string;
+};
+
+type PredictionDetailState = {
+  prediction?: PredictionWithUserMeta;
+  race_point?: RacePoint;
+  user?: { id?: number; name?: string; profile_pic?: string };
+} | null;
+
 const defaultScoring: Scoring = {
   p1: 10,
   p2: 6,
@@ -105,11 +116,7 @@ export default function ResultadosPage() {
   const [raceResults, setRaceResults] = useState<RaceResultEntry[]>([]);
   const [racePoints, setRacePoints] = useState<RacePoint[]>([]);
   const [selectedPoint, setSelectedPoint] = useState<RacePoint | null>(null);
-  const [predictionDetail, setPredictionDetail] = useState<{
-    prediction?: PredictionPayload;
-    race_point?: RacePoint;
-    user?: { id?: number; name?: string };
-  } | null>(null);
+  const [predictionDetail, setPredictionDetail] = useState<PredictionDetailState>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [scoring] = useState<Scoring>(defaultScoring);
@@ -128,8 +135,7 @@ export default function ResultadosPage() {
 
   useEffect(() => {
     loadChampionships();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+      }, [user?.id]);
 
   useEffect(() => {
     loadDrivers();
@@ -139,8 +145,7 @@ export default function ResultadosPage() {
     if (!selectedChampionship) return;
     loadMembers(selectedChampionship.id);
     loadLastRace(selectedChampionship);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedChampionship?.id]);
+      }, [selectedChampionship?.id]);
 
   async function loadChampionships() {
     try {
@@ -236,12 +241,12 @@ export default function ResultadosPage() {
     try {
       const data = await getUserRacePrediction(selectedChampionship.id, lastRace.id, userId);
       setPredictionDetail({
-        prediction: data?.prediction ?? data,
+        prediction: (data?.prediction ?? data) as PredictionWithUserMeta,
         race_point: data?.race_point ?? point,
         user:
-          data?.user ??
+          (data as { user?: { id?: number; name?: string; profile_pic?: string } })?.user ??
           members.find((m) => m.id === userId) ??
-          { id: userId, name: point.user?.name },
+          { id: userId, name: point.user?.name, profile_pic: point.user?.profile_pic },
       });
     } catch (err) {
       const msg =
@@ -407,7 +412,7 @@ export default function ResultadosPage() {
             )}
 
             {!raceLoading && lastRace && racePoints.length === 0 && (
-              <p className="text-sm text-primary/70">
+              <p className="text-sm text-white">
                 Aún no hay puntos calculados para este Gran Premio.
               </p>
             )}
@@ -567,7 +572,7 @@ function PredictionModal({
   onClose,
 }: {
   point: RacePoint;
-  prediction?: PredictionPayload;
+  prediction?: PredictionWithUserMeta;
   scoring: Scoring;
   loading: boolean;
   error: string | null;

@@ -65,6 +65,7 @@ export interface User {
   email: string;
   country?: string;
   profile_pic?: string;
+  is_admin?: boolean | number;
 }
 
 export interface Championship {
@@ -94,6 +95,7 @@ export interface Driver {
 
 export interface Race {
   id: number;
+  season_id?: number;
   name: string;
   round_number?: number;
   round?: number;
@@ -102,6 +104,13 @@ export interface Race {
   grand_prix?: string; // compatibilidad
   date?: string;       // compatibilidad
   deadline?: string;   // compatibilidad
+  is_result_confirmed?: boolean | number;
+}
+
+export interface Season {
+  id: number;
+  year: number;
+  is_current_season?: boolean | number;
 }
 
 export interface PredictionPayload {
@@ -238,6 +247,21 @@ export async function changePassword(payload: {
   try {
     await csrf();
     const { data } = await api.put("/api/user/password", payload);
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+//
+// ============================================================
+// SEASONS
+// ============================================================
+//
+
+export async function getSeasons(): Promise<Season[]> {
+  try {
+    const { data } = await api.get("/api/seasons");
     return data;
   } catch (error) {
     throw new Error(getErrorMessage(error));
@@ -482,6 +506,14 @@ export async function savePrediction(
 // ============================================================
 //
 
+export type RaceResultInput = {
+  driver_id: number;
+  position?: number | null;
+  is_pole?: boolean;
+  fastest_lap?: boolean;
+  is_last_place?: boolean;
+};
+
 export async function getSeasonRaces(seasonId: number): Promise<Race[]> {
   try {
     const { data } = await api.get(`/api/seasons/${seasonId}/races`);
@@ -512,6 +544,39 @@ export async function getLastRace(): Promise<Race> {
 export async function getRaceResults(raceId: number) {
   try {
     const { data } = await api.get(`/api/races/${raceId}/results`);
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function saveRaceResults(
+  raceId: number,
+  results: RaceResultInput[]
+) {
+  try {
+    await csrf();
+    const { data } = await api.post(`/api/races/${raceId}/results`, { results });
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function confirmRace(raceId: number) {
+  try {
+    await csrf();
+    const { data } = await api.post(`/api/races/${raceId}/confirm`);
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function calculateRacePoints(raceId: number) {
+  try {
+    await csrf();
+    const { data } = await api.post(`/api/races/${raceId}/calculate`);
     return data;
   } catch (error) {
     throw new Error(getErrorMessage(error));

@@ -22,14 +22,18 @@ export default function LoginPage() {
     setLocalError(null);
     setSubmitting(true);
 
-    const ok = await login(email.trim().toLowerCase(), password);
+    const loggedUser = await login(email.trim().toLowerCase(), password);
 
     setSubmitting(false);
 
-    if (ok) {
-      router.push("/campeonatos");
+    if (loggedUser) {
+      const isAdmin =
+        typeof loggedUser.is_admin === "boolean"
+          ? loggedUser.is_admin
+          : Boolean(loggedUser.is_admin);
+      router.push(isAdmin ? "/admin" : "/campeonatos");
     } else {
-      setLocalError("Email o contrasena incorrectos.");
+      setLocalError("Email o contraseña incorrectos.");
     }
   }
 

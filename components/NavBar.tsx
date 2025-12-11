@@ -4,23 +4,47 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { useAuth } from "@/context/AuthContext";
-import { useEffect } from "react";
-
-const tabs = [
-  { name: "Campeonatos", href: "/campeonatos" },
-  { name: "Predicciones", href: "/predicciones" },
-  { name: "Resultados", href: "/resultados" },
-  { name: "Ajustes", href: "/ajustes" },
-];
+import { useEffect, useState } from "react";
+import { getUserChampionships } from "@/lib/api";
 
 export function NavBar() {
   const pathname = usePathname();
   const { user, loading, reloadUser } = useAuth();
+  const isAdmin =
+    typeof user?.is_admin === "boolean" ? user.is_admin : Boolean(user?.is_admin);
+
+  const [hasChampionships, setHasChampionships] = useState<boolean | null>(null);
+  const [checkingChamps, setCheckingChamps] = useState(false);
+
+  const tabs = [
+    { name: "Campeonatos", href: "/campeonatos" },
+    { name: "Predicciones", href: "/predicciones" },
+    { name: "Resultados", href: "/resultados" },
+    { name: "Ajustes", href: "/ajustes" },
+    ...(isAdmin ? [{ name: "Admin", href: "/admin" }] : []),
+  ];
 
   useEffect(() => {
     reloadUser().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    setCheckingChamps(true);
+    getUserChampionships()
+      .then((list) => setHasChampionships(list.length > 0))
+      .catch(() => setHasChampionships(false))
+      .finally(() => setCheckingChamps(false));
+  }, [user?.id]);
+
+  const isTabDisabled = (href: string) => {
+    if (checkingChamps) return false; // no bloqueo mientras carga
+    if (hasChampionships === false && (href === "/predicciones" || href === "/resultados")) {
+      return true;
+    }
+    return false;
+  };
 
   return (
     <header className="mb-8">
@@ -30,12 +54,31 @@ export function NavBar() {
           <div className="hidden md:flex flex-1 items-center gap-2 justify-between rounded-full bg-primary px-0 py-0">
             {tabs.map((tab) => {
               const active = pathname.startsWith(tab.href);
+              const disabled = isTabDisabled(tab.href);
+              const commonClasses =
+                "rounded-full px-4 md:px-6 lg:px-14 xl:px-20 2xl:px-30 py-4 font-league transition-colors";
+
+              if (disabled) {
+                return (
+                  <span
+                    key={tab.href}
+                    className={clsx(
+                      commonClasses,
+                      "text-white/60 cursor-not-allowed select-none bg-primary/70"
+                    )}
+                    title="Únete a un campeonato para acceder"
+                  >
+                    {tab.name}
+                  </span>
+                );
+              }
+
               return (
                 <Link
                   key={tab.href}
                   href={tab.href}
                   className={clsx(
-                    "rounded-full px-4 md:px-6 lg:px-14 xl:px-20 2xl:px-30 py-4 font-league transition-colors",
+                    commonClasses,
                     active
                       ? "bg-primary-hover text-white shadow-sm"
                       : "text-white hover:bg-primary-hover hover:text-white"
@@ -75,12 +118,31 @@ export function NavBar() {
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1 md:hidden">
           {tabs.map((tab) => {
             const active = pathname.startsWith(tab.href);
+            const disabled = isTabDisabled(tab.href);
+            const baseClasses =
+              "whitespace-nowrap rounded-full px-3 py-2 text-xs font-league";
+
+            if (disabled) {
+              return (
+                <span
+                  key={tab.href}
+                  className={clsx(
+                    baseClasses,
+                    "border border-primary/40 bg-white text-primary/50 cursor-not-allowed select-none"
+                  )}
+                  title="Únete a un campeonato para acceder"
+                >
+                  {tab.name}
+                </span>
+              );
+            }
+
             return (
               <Link
                 key={tab.href}
                 href={tab.href}
                 className={clsx(
-                  "whitespace-nowrap rounded-full px-3 py-2 text-xs font-league",
+                  baseClasses,
                   active
                     ? "bg-primary text-white"
                     : "border border-primary bg-white text-primary"

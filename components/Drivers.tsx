@@ -67,7 +67,7 @@ export function Drivers({
               {sortedDrivers.map((driver) => (
                 <option key={driver.id} value={driver.id}>
                   #{driver.number ?? "?"} {driver.name}
-                  {driver.country ? ` (${driver.country})` : ""}
+                  {driver.country ? ` ${driver.country}` : ""}
                 </option>
               ))}
             </select>
