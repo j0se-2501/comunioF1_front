@@ -256,7 +256,7 @@ export default function ResultadosPage() {
 
           <div className="space-y-2">
             <h3 className="text-lg font-league uppercase tracking-wide">
-              GRAN PREMIO DE {formatRaceName(lastRace)}
+              Gran Premio de {formatRaceName(lastRace)}:
             </h3>
             <div className="rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur space-y-3">
               {raceLoading ? (
@@ -308,7 +308,7 @@ export default function ResultadosPage() {
         {/* Columna 2: resultados del último GP (puntos) */}
         <section className="space-y-3 lg:col-span-4">
           <h3 className="text-lg font-league uppercase tracking-wide">
-            Resultados del último GP: {formatRaceName(lastRace)}
+            Resultados del último GP ({formatRaceName(lastRace)}):
           </h3>
           <div className="rounded-2xl bg-primary-hover p-5 shadow-sm backdrop-blur space-y-3">
             {raceLoading && (
