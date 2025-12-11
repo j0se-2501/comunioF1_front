@@ -298,6 +298,9 @@ export default function CampeonatosPage() {
                       season_id: seasonId!,
                     });
                     setToast("Campeonato creado.");
+                    if (typeof window !== "undefined") {
+                      window.dispatchEvent(new Event("championships:refresh"));
+                    }
                     await reloadChampionships();
                     if (res?.championship?.id) {
                       setSelectedId(res.championship.id);
@@ -341,6 +344,9 @@ export default function CampeonatosPage() {
                     try {
                       const res = await joinChampionship(joinCode);
                       setToast("Te has unido al campeonato.");
+                      if (typeof window !== "undefined") {
+                        window.dispatchEvent(new Event("championships:refresh"));
+                      }
                       await reloadChampionships();
                       if (res?.championship?.id) {
                         setSelectedId(res.championship.id);
@@ -477,6 +483,9 @@ function ChampionshipPanel({
           ? "Campeonato eliminado."
           : "Has abandonado el campeonato."
       );
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("championships:refresh"));
+      }
       await onLeft(championship.id);
     } catch (err) {
       const msg =
@@ -627,24 +636,22 @@ function ChampionshipPanel({
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end sm:gap-4">
           {error && <p className="text-sm text-red-600">{error}</p>}
-          {championship.isAdmin ? (
-            <>
-              <Button
-                className="w-full cursor-pointer rounded-2xl px-5 py-3 font-league sm:w-auto"
-                onClick={handleSave}
-                disabled={saving}
-              >
-                {saving ? "Guardando..." : "Guardar ajustes"}
-              </Button>
-              <Button
-                variant="secondary"
-                className="w-full rounded-2xl cursor-pointer px-5 py-3 font-league sm:w-auto"
-                onClick={handleLeave}
-              >
-                Abandonar campeonato
-              </Button>
-            </>
-          ) : null}
+          {championship.isAdmin && (
+            <Button
+              className="w-full cursor-pointer rounded-2xl px-5 py-3 font-league sm:w-auto"
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? "Guardando..." : "Guardar ajustes"}
+            </Button>
+          )}
+          <Button
+            variant={championship.isAdmin ? "secondary" : "primary"}
+            className="w-full rounded-2xl cursor-pointer px-5 py-3 font-league sm:w-auto"
+            onClick={handleLeave}
+          >
+            {championship.isAdmin ? "Eliminar/abandonar" : "Abandonar campeonato"}
+          </Button>
         </div>
       </section>
     </>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { useAuth } from "@/context/AuthContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getUserChampionships } from "@/lib/api";
 
 export function NavBar() {
@@ -15,6 +15,22 @@ export function NavBar() {
 
   const [hasChampionships, setHasChampionships] = useState<boolean | null>(null);
   const [checkingChamps, setCheckingChamps] = useState(false);
+
+  const refreshChampionshipsFlag = useCallback(async () => {
+    if (!user?.id) {
+      setHasChampionships(null);
+      return;
+    }
+    setCheckingChamps(true);
+    try {
+      const list = await getUserChampionships();
+      setHasChampionships(list.length > 0);
+    } catch {
+      setHasChampionships(false);
+    } finally {
+      setCheckingChamps(false);
+    }
+  }, [user?.id]);
 
   const tabs = [
     { name: "Campeonatos", href: "/campeonatos" },
@@ -30,13 +46,15 @@ export function NavBar() {
   }, [pathname]);
 
   useEffect(() => {
-    if (!user?.id) return;
-    setCheckingChamps(true);
-    getUserChampionships()
-      .then((list) => setHasChampionships(list.length > 0))
-      .catch(() => setHasChampionships(false))
-      .finally(() => setCheckingChamps(false));
-  }, [user?.id]);
+    refreshChampionshipsFlag();
+  }, [user?.id, refreshChampionshipsFlag]);
+
+  // Escuchar eventos globales para refrescar sin recargar la página
+  useEffect(() => {
+    const handler = () => refreshChampionshipsFlag();
+    window.addEventListener("championships:refresh", handler);
+    return () => window.removeEventListener("championships:refresh", handler);
+  }, [refreshChampionshipsFlag]);
 
   const isTabDisabled = (href: string) => {
     if (checkingChamps) return false; // no bloqueo mientras carga

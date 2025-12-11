@@ -141,13 +141,13 @@ export default function AjustesPage() {
           {profileMessage && <p className="text-sm text-green-700">{profileMessage}</p>}
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Button type="submit" disabled={savingProfile} className="w-full sm:w-auto min-w-[180px]">
+            <Button type="submit" disabled={savingProfile} className="w-full cursor-pointer sm:w-auto min-w-[180px]">
               {savingProfile ? "Guardando..." : "Guardar ajustes"}
             </Button>
             <Button
               type="button"
               variant="secondary"
-              className="w-full sm:w-auto min-w-[180px]"
+              className="w-full cursor-pointer sm:w-auto min-w-[180px]"
               onClick={() => {
                 setName(user?.name ?? "");
                 setCountry(user?.country ?? "");
@@ -204,15 +204,15 @@ export default function AjustesPage() {
           {passMessage && <p className="text-sm text-green-700">{passMessage}</p>}
 
           <div className="mt-6">
-            <Button type="submit" disabled={savingPass} className="w-full sm:w-auto min-w-[200px]">
+            <Button type="submit" disabled={savingPass} className="w-full cursor-pointer sm:w-auto min-w-[200px]">
               {savingPass ? "Guardando..." : "Cambiar contraseña"}
             </Button>
           </div>
         </form>
       </div>
 
-      <div className="mt-8 sm:mt-10 flex justify-center">
-        <Button variant="primary" onClick={logout} className="w-full sm:w-auto min-w-[200px]">
+      <div className="mt-8 sm:mt-10  flex justify-center">
+        <Button variant="primary" onClick={logout} className="w-full cursor-pointer sm:w-auto min-w-[200px]">
           Cerrar sesión
         </Button>
       </div>
