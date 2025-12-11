@@ -6,8 +6,10 @@ import {
   getSeasonRaces,
   getRaceResults,
   getChampionshipActiveMembers,
+  getRacePoints,
   type Championship as ApiChampionship,
   type Race,
+  type RacePoint,
 } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
@@ -72,6 +74,7 @@ export default function ResultadosPage() {
   const [members, setMembers] = useState<MemberWithPivot[]>([]);
   const [lastRace, setLastRace] = useState<Race | null>(null);
   const [raceResults, setRaceResults] = useState<RaceResultEntry[]>([]);
+  const [racePoints, setRacePoints] = useState<RacePoint[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [raceLoading, setRaceLoading] = useState(false);
@@ -125,6 +128,7 @@ export default function ResultadosPage() {
     if (!championship.season_id) {
       setLastRace(null);
       setRaceResults([]);
+      setRacePoints([]);
       return;
     }
 
@@ -142,13 +146,23 @@ export default function ResultadosPage() {
           console.error("No se pudieron cargar los resultados", err);
           setRaceResults([]);
         }
+
+        try {
+          const points = await getRacePoints(championship.id, latest.id);
+          setRacePoints(points);
+        } catch (err) {
+          console.error("No se pudieron cargar los race points", err);
+          setRacePoints([]);
+        }
       } else {
         setRaceResults([]);
+        setRacePoints([]);
       }
     } catch (err) {
       console.error("No se pudieron cargar las carreras", err);
       setLastRace(null);
       setRaceResults([]);
+      setRacePoints([]);
     } finally {
       setRaceLoading(false);
     }
@@ -222,7 +236,7 @@ export default function ResultadosPage() {
 
           <div className="space-y-2">
             <h3 className="text-lg font-league uppercase tracking-wide">
-              {formatRaceName(lastRace)}
+              GRAN PREMIO DE {formatRaceName(lastRace)}
             </h3>
             <div className="rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur space-y-3">
               {raceLoading ? (
@@ -274,24 +288,37 @@ export default function ResultadosPage() {
         {/* Columna 2: resultados del último GP (puntos) */}
         <section className="space-y-3 lg:col-span-4">
           <h3 className="text-lg font-league uppercase tracking-wide">
-            Resultados del último GP:
+            Resultados del último GP: {formatRaceName(lastRace)}
           </h3>
-          <div className="rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur">
-            {lastRace ? (
-              <div className="space-y-3">
-                <p className="text-sm font-roboto text-primary/80">
-                  Mostramos la tabla de puntos cuando el backend exponga los
-                  RacePoints de la carrera. Por ahora puedes consultar la
-                  clasificación general a la derecha.
-                </p>
-                <div className="rounded-2xl bg-primary/90 text-white px-4 py-3 font-league text-center">
-                  {formatRaceName(lastRace)}
-                </div>
-              </div>
-            ) : (
+          <div className="rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur space-y-3">
+            {raceLoading && (
               <p className="text-sm text-primary/70">
-                No hay GP finalizado todavía para mostrar puntuaciones.
+                Cargando puntos del último GP...
               </p>
+            )}
+
+            {!raceLoading && lastRace && racePoints.length === 0 && (
+              <p className="text-sm text-primary/70">
+                Aún no hay puntos calculados para este Gran Premio.
+              </p>
+            )}
+
+            {!raceLoading && racePoints.length > 0 && (
+              <div className="flex flex-col gap-3">
+                {racePoints
+                  .slice()
+                  .sort((a, b) => (b.points ?? 0) - (a.points ?? 0))
+                  .map((rp, idx) => (
+                    <StandingRow
+                      key={rp.id}
+                      position={idx + 1}
+                      name={rp.user?.name ?? "Usuario"}
+                      country={rp.user?.country}
+                      profile_pic={rp.user?.profile_pic}
+                      points={rp.points ?? 0}
+                    />
+                  ))}
+              </div>
             )}
           </div>
         </section>
@@ -299,7 +326,7 @@ export default function ResultadosPage() {
         {/* Columna 3: clasificación del mundial / campeonato */}
         <section className="space-y-3 lg:col-span-4">
           <h3 className="text-lg font-league uppercase tracking-wide">
-            Clasificación del mundial:
+            Clasificación general:
           </h3>
           <div className="rounded-2xl bg-white/70 p-5 shadow-sm backdrop-blur space-y-3">
             {orderedMembers.length ? (
@@ -309,6 +336,7 @@ export default function ResultadosPage() {
                   position={member.pivot?.position ?? idx + 1}
                   name={member.name}
                   country={member.country}
+                  profile_pic={member.profile_pic}
                   points={member.pivot?.total_points ?? 0}
                 />
               ))
@@ -350,27 +378,42 @@ function StandingRow({
   position,
   name,
   country,
+  profile_pic,
   points,
 }: {
   position: number;
   name: string;
   country?: string;
+  profile_pic?: string;
   points: number;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-full bg-primary/90 px-4 py-2 text-white shadow-sm">
-      <span className="w-6 text-center font-league">{position}.</span>
-      <div className="flex items-center gap-2 flex-1">
-        {country && (
-          <span className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-primary">
-            {country}
-          </span>
-        )}
-        <span className="font-league truncate">{name}</span>
-      </div>
-      <span className="min-w-[48px] text-right font-semibold">{points}</span>
+    <div className="flex items-center gap-2 rounded-2xl bg-white px-3 py-2 shadow-sm border border-gray-200">
+      <span className="w-6 text-right font-league text-primary">{position}.</span>
+      {country && (
+        <span className="w-12 text-center rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-semibold text-primary">
+          {country}
+        </span>
+      )}
+      {profile_pic ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={profile_pic}
+          alt={name}
+          className="h-9 w-9 rounded-full border border-gray-200 object-cover"
+        />
+      ) : (
+        <div className="h-9 w-9 rounded-full border border-gray-200 bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
+          {name.charAt(0).toUpperCase()}
+        </div>
+      )}
+      <span className="flex-1 rounded-md border border-gray-200 bg-white px-2 py-2 text-sm font-roboto text-primary shadow-inner">
+        {name}
+      </span>
+      <span className="min-w-[48px] text-right font-semibold text-primary">{points}</span>
     </div>
   );
 }
+
 
 

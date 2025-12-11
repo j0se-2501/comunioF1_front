@@ -96,6 +96,7 @@ export interface Race {
   id: number;
   name: string;
   round_number?: number;
+  round?: number;
   race_date?: string;
   qualy_date?: string;
   grand_prix?: string; // compatibilidad
@@ -120,6 +121,25 @@ export interface UserSettings {
   email: string;
   country?: string;
   profile_pic?: string;
+}
+
+export interface RacePoint {
+  id: number;
+  prediction_id: number;
+  race_id: number;
+  championship_id: number;
+  user_id: number;
+  points: number;
+  guessed_p1?: boolean;
+  guessed_p2?: boolean;
+  guessed_p3?: boolean;
+  guessed_p4?: boolean;
+  guessed_p5?: boolean;
+  guessed_p6?: boolean;
+  guessed_pole?: boolean;
+  guessed_fastest_lap?: boolean;
+  guessed_last_place?: boolean;
+  user?: User;
 }
 
 //
@@ -480,9 +500,32 @@ export async function getRace(raceId: number): Promise<Race> {
   }
 }
 
+export async function getLastRace(): Promise<Race> {
+  try {
+    const { data } = await api.get(`/api/races/last`);
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
 export async function getRaceResults(raceId: number) {
   try {
     const { data } = await api.get(`/api/races/${raceId}/results`);
+    return data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function getRacePoints(
+  championshipId: number,
+  raceId: number
+): Promise<RacePoint[]> {
+  try {
+    const { data } = await api.get(
+      `/api/championships/${championshipId}/races/${raceId}/race-points`
+    );
     return data;
   } catch (error) {
     throw new Error(getErrorMessage(error));
