@@ -105,7 +105,7 @@ export function ModalRegistrarse({
             </button>
           </div>
           <label className="text-sm font-roboto text-primary">
-            Contrasena
+            Contraseña
             <input
               type="password"
               className="mt-1 w-full border border-gray-300 px-2 py-2 text-sm"
@@ -116,7 +116,7 @@ export function ModalRegistrarse({
             />
           </label>
           <label className="text-sm font-roboto text-primary">
-            Confirmar contrasena
+            Confirmar contraseña
             <input
               type="password"
               className="mt-1 w-full border border-gray-300 px-2 py-2 text-sm"
