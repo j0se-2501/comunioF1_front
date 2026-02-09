@@ -297,7 +297,8 @@ export default function AdminPage() {
     try {
       await saveRaceResults(selectedRaceId, payload);
       await confirmRace(selectedRaceId);
-      setToast("Resultado guardado y carrera confirmada.");
+      await calculateRacePoints(selectedRaceId);
+      setToast("Resultado guardado, carrera confirmada y puntos calculados.");
       await loadRaceData(selectedRaceId);
     } catch (err) {
       const msg =
